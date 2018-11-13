@@ -1,0 +1,6 @@
+num=eval(input("Guess number of chocs :"))
+count4=0
+for i in range (1,num):
+    if num%i==0:
+        count4=i+count4
+print('summation is:',count4)
