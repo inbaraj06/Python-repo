@@ -1,0 +1,14 @@
+for i in range(1,10000):
+  #print ('value is',i)
+  count=0
+  for j in range(1,i):
+    if i%j==0:
+    #   print(i,j)
+       count=count+j 
+    #   print ('total:',count)
+  #print('t',count) 
+  #print('o',i) 
+  if i==count:
+      print('Final value is',i) 
+  #if count==i:
+   # print ('total:',count)
