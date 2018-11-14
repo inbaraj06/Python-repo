@@ -1,0 +1,9 @@
+s='inba t is'
+count=0
+for c in s:
+    if c in 'aeiou':
+     count=count+1
+ #print(c,end='')
+print('number of vowles :',count)
+print('number of lcoation:',s[4:7])
+print('number of lcoation:',s.index('s'))
