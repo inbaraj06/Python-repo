@@ -1,0 +1,26 @@
+""" Print the total number of items in the list.
+(b) Print the last item in the list.
+(c) Print the list in reverse order.
+(d) Print Yes if the list contains a 5 and No otherwise.
+(e) Print the number of fives in the list.
+(f) Remove the first and last items from the list, sort the remaining items, and print the
+result.
+7.7. EXERCISES 63
+(g) Print how many integers in the list are less than 5 """
+num=[5,16,17,8,9,12,5,16,18,5,18,20,6,7]
+print(num)
+print(len(num))
+print(num[-1])
+if 5 in num: 
+   print('yes')
+print(num.count(5))
+num.pop(-1)
+num.pop(0)
+num.sort()
+print(num)
+count=0
+for i in num:
+    if i <9:
+        count=count+1
+print(count)
+  
