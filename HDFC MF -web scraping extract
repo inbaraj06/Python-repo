@@ -6,6 +6,8 @@ soup = BeautifulSoup(page,"lxml")
 #print(soup.title)
 #right_table=soup.find('table', class_='wikitable sortable plainrowheaders')
 right_table=soup.find('table', class_='responsive')
+#right_table=soup.find('div',class_="clearfix hist_tbl tbl_oddwrp MT10")
+#right_table=soup.find('div',class_="clearfix hist_tbl tbl_oddwrp MT2")
 print(right_table.findAll("tr"))
 #Generate lists
 A=[]
