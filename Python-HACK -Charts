@@ -1,0 +1,41 @@
+import pandas as pd
+import numpy as np                     # For mathematical calculations
+import seaborn as sns                  # For data visualization
+import matplotlib.pyplot as plt        # For plotting graphs
+#%matplotlib inline
+import warnings                        # To ignore any warnings
+warnings.filterwarnings("ignore")
+
+train=pd.read_csv(r'C:\Users\6360isriniva\work\train.csv')
+test=pd.read_csv(r'C:\Users\6360isriniva\work\test.csv')
+print(test.ndim,test.shape,test.columns,test.index,test.dtypes,sep='\n')
+train_original=train.copy()
+test_original=test.copy()
+print(train['Loan_Status'].value_counts())
+print(train['Loan_Status'].value_counts(normalize=True))
+ax = train['Loan_Status'].value_counts().plot(kind='bar', figsize=(8,7),color="coral", fontsize=10);
+ax.set_alpha(10)
+ax.set_title("Load status approved ", fontsize=15)
+ax.set_xlabel("Gender", fontsize=18);
+ax.set_yticks(list(range(0,500,50)))
+# create a list to collect the plt.patches data
+totals = []
+# find the values and append to list
+for i in ax.patches:
+    totals.append(i.get_height())
+print('values is ',totals)
+total = sum(totals)
+# set individual bar lables using above list
+for i in ax.patches:
+    # get_x pulls left or right; get_height pushes up or down
+    ax.text(i.get_x()+.12, i.get_height()+3, \
+            str(round((i.get_height()/total)*100, 2))+'%', fontsize=22,
+                color='red')
+# set individual bar lables using above list
+for i in ax.patches:
+    # get_x pulls left or right; get_height pushes up or down
+    ax.text(i.get_x()+.04, i.get_height()+-100, \
+            str(round((i.get_height()), 2)), fontsize=25, color='red'
+                )
+              
+              
