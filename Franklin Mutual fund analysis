@@ -1,0 +1,35 @@
+import pandas as pd 
+import re as re 
+df=pd.read_excel(r'C:\Users\Admin\Downloads\work\frmf1.xlsx',sheet_name=10,
+                 skiprows=3,
+                 index_col=0,names=['Instrument','Industry','Quantity','MarketValue','Percentage Assets'])
+df_title=pd.read_excel(r'C:\Users\Admin\Downloads\work\frmf1.xlsx'
+                       ,sheet_name=10,nrows=0,parse_cols=0)
+x=df_title.columns
+y=x[0]
+y=y.split('As')
+print(type(df_title))
+print(df_title.columns,df_title.index)
+df=df.dropna(subset=['Instrument'])
+df['Quantity']=df['Quantity'].astype('int64')
+df['MarketValue']=df['MarketValue'].astype('float64')
+df['Percentage Assets']=df['Percentage Assets'].astype('float64')
+
+print(df.dtypes,df.columns,sep='\n',) 
+#df'Asset Type']=np.where(if '%' in df['Instrument'],'Debt','Equity')
+print(df.loc[(df['Instrument']=='Voltas Ltd.') & (df['Industry']=='Construction Project')])
+print(df.loc[df['Industry']=='Banks'])
+print(df.iloc[:4,:2])
+print(df.iloc[6:14,:3])
+print(df.index,df.columns,sep='\n')
+print(df.iloc[:,0])
+print(df[df['Industry']=='Banks'])
+#df=df.assign(Asset=lambda x:( 'Equity' if x['Industry']== 'Banks'else 'Debt'))
+df['Asset']=df['Instrument'].apply(lambda x:'Govec' if ('%' in x and 'GOI' in x)  else ('Debt' if '%' in x else 'Equity'))
+df['FundName']=y[0]
+#print(df.iloc[:6,3])
+#print(df.iloc[:,2:])
+print(df)
+print(df.sum())
+
+
