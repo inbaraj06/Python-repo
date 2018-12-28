@@ -1,9 +1,11 @@
 import pandas as pd 
-import re as re 
-df=pd.read_excel(r'C:\Users\Admin\Downloads\work\frmf1.xlsx',sheet_name=10,
+import numpy as np
+import matplotlib.pyplot as plt
+#import re as re 
+df=pd.read_excel(r'C:\Users\6360isriniva\work\FRMF.xlsx',sheet_name=10,
                  skiprows=3,
                  index_col=0,names=['Instrument','Industry','Quantity','MarketValue','Percentage Assets'])
-df_title=pd.read_excel(r'C:\Users\Admin\Downloads\work\frmf1.xlsx'
+df_title=pd.read_excel(r'C:\Users\6360isriniva\work\FRMF.xlsx'
                        ,sheet_name=10,nrows=0,parse_cols=0)
 x=df_title.columns
 y=x[0]
@@ -31,5 +33,13 @@ df['FundName']=y[0]
 #print(df.iloc[:,2:])
 print(df)
 print(df.sum())
+#df.plot.bar(x='Industry',y=['Percentage Assets'])
+df.groupby('Industry').sum().plot( y='Percentage Assets',title= '% Assets',kind='bar')
+df[df['Asset']=='Equity'].groupby('Industry').sum().plot(y='Quantity' ,title= '% Assets',kind='bar')
 
-
+# set individual bar lables using above list
+for i in df.patches:
+    # get_x pulls left or right; get_height pushes up or down
+    df.text(i.get_x()+.04, i.get_height()+120, \
+            str(round((i.get_height()), 2)), fontsize=111, color='dimgrey',
+                rotation=45)
