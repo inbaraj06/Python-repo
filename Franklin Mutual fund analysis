@@ -34,12 +34,13 @@ df['FundName']=y[0]
 print(df)
 print(df.sum())
 #df.plot.bar(x='Industry',y=['Percentage Assets'])
-df.groupby('Industry').sum().plot( y='Percentage Assets',title= '% Assets',kind='bar')
+#df.groupby('Industry').sum().plot( y='Percentage Assets',title= '% Assets',kind='bar')
 df[df['Asset']=='Equity'].groupby('Industry').sum().plot(y='Quantity' ,title= '% Assets',kind='bar')
 
+ax=df[df['Asset']=='Equity'].groupby(['Industry','Instrument']).sum().unstack().plot(y='Percentage Assets' ,title= '% Assets',kind='bar',figsize=(15,15),stacked=True)
 # set individual bar lables using above list
-for i in df.patches:
+for i in ax.patches:
     # get_x pulls left or right; get_height pushes up or down
-    df.text(i.get_x()+.04, i.get_height()+120, \
-            str(round((i.get_height()), 2)), fontsize=111, color='dimgrey',
-                rotation=45)
+   ax.text(i.get_x()+.04, i.get_height()+2, \
+          str(round((i.get_height()), 2)), fontsize=11, color='dimgrey',
+             rotation=45)
