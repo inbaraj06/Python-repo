@@ -1,18 +1,21 @@
+
 import pandas as pd 
 import numpy as np
 import matplotlib.pyplot as plt
-yl = pd.ExcelFile(r'C:\Users\Admin\Downloads\work\frmf3.xlsx')
+input_path= r'C:\Users\6360isriniva\work\frmf2.xlsx'
+print(input_path)
+yl = pd.ExcelFile(input_path)
 res = len(yl.sheet_names)
 print(res)
 x=[]
-for i in range(45,54):
-  clm =pd.read_excel(r'C:\Users\Admin\Downloads\work\frmf3.xlsx',sheet_name=i,
-                 skiprows=[1,3],
+for i in range(0,res):
+  clm =pd.read_excel(input_path,sheet_name=i,
+                 skiprows=[2,3],
                  index_col=0,
                  usecols=5)
   if len(clm.columns) ==5: 
-     df1=pd.read_excel(r'C:\Users\Admin\Downloads\work\frmf3.xlsx',sheet_name=i,
-                 skiprows=[1,3],
+     df1=pd.read_excel(input_path,sheet_name=i,
+                 skiprows=[2,3],
                  index_col=0,names=['Instrument','Industry','Quantity','MarketValue','Percentage Assets'],
                  usecols=5)
      df1['FundName'] =df1.index.name.split('As')[0]
@@ -29,4 +32,20 @@ for i in range(45,54):
 df2=pd.concat(x)
 df2.index.name='ISIN Number'
 print(df2.columns,df2.dtypes)
-df2.to_excel(r'C:\Users\Admin\Downloads\work\rs5.xlsx')
+#df2.to_excel(r'C:\Users\6360isriniva\work\rs5.xlsx')
+df2.to_excel(r'C:\Users\6360isriniva\work\rs6.xlsx')
+
+import pandas as pd 
+import numpy as np
+import matplotlib.pyplot as plt
+df1=pd.read_excel(r'C:\Users\6360isriniva\work\rs5.xlsx',
+                 index_col=0)
+df2=pd.read_excel(r'C:\Users\6360isriniva\work\rs6.xlsx',
+                 index_col=0)
+df1=df1.dropna(0)
+df2=df2.dropna(0)
+print(type(df1),type(df2),sep='\n')
+print(df1.dtypes,df2.dtypes,sep='\n')
+print(df1.head(),df2.head(),sep='\n')
+df5=pd.merge(df1,df2,on=['ISIN Number','FundName'],how='outer')
+df5.to_excel(r'C:\Users\6360isriniva\work\rs8.xlsx')
