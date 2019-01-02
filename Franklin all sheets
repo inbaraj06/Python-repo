@@ -53,5 +53,20 @@ df5.update(df5[['Quantity_x','Quantity_y','MarketValue_x','MarketValue_y',
 df5['Quantity_diff']=(df5['Quantity_x']-df5['Quantity_y'])
 df5['MarketValue_diff']=(df5['MarketValue_x']-df5['MarketValue_y'])
 df5['Percentage Assets_diff']=(df5['Percentage Assets_x']-df5['Percentage Assets_y'])
-df5['%of Quanity']=(df5[['Quantity_x','Quantity_y']]).pct_change(Periods=1,axis=1)
-df5.to_excel(r'C:\Users\Admin\Downloads\work\rs3.xlsx')
+df5['Stockname']=np.where(df5.Instrument_x.isnull(),df5.Instrument_y,df5.Instrument_x)
+df5['Asset']=np.where(df5.Asset_x.isnull(),df5.Asset_y,df5.Asset_x)
+df5['% Quantity']=((df5['Quantity_x']-df5['Quantity_y'])/np.where(df5.Quantity_x==0,df5.Quantity_y,df5.Quantity_x))*100
+#df5.to_excel(r'C:\Users\Admin\Downloads\work\rs3.xlsx')
+print(df5['FundName'].unique())
+x=df5[df5['Asset']=='Equity']
+y=x['FundName'].unique().tolist()
+print(len(y))
+print(y)
+for i in y:
+   print('value is ',i)
+   df5[(df5['Asset']=='Equity') & (df5['FundName']== i)].groupby('Stockname').sum().nlargest(5,'% Quantity').plot(y=['Quantity_x','Quantity_y'],
+      title=i,kind='bar',figsize=(10,10))
+   df5[(df5['Asset']=='Equity') & (df5['FundName']== i)].groupby('Stockname').sum().nsmallest(5,'% Quantity').plot(y=['Quantity_x','Quantity_y'],
+      title=i,kind='bar',figsize=(10,10))
+   df5[(df5['Asset']=='Equity') & (df5['FundName']== i)].groupby('Stockname').sum().nsmallest(5,'% Quantity').plot (Table=True)
+      
