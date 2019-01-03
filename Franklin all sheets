@@ -42,8 +42,6 @@ df1=pd.read_excel(r'C:\Users\6360isriniva\work\rs5.xlsx',
                  index_col=0)
 df2=pd.read_excel(r'C:\Users\6360isriniva\work\rs6.xlsx',
                  index_col=0)
-df1=df1.dropna(0)
-df2=df2.dropna(0)
 print(type(df1),type(df2),sep='\n')
 print(df1.dtypes,df2.dtypes,sep='\n')
 print(df1.head(),df2.head(),sep='\n')
@@ -57,16 +55,51 @@ df5['Stockname']=np.where(df5.Instrument_x.isnull(),df5.Instrument_y,df5.Instrum
 df5['Asset']=np.where(df5.Asset_x.isnull(),df5.Asset_y,df5.Asset_x)
 df5['% Quantity']=((df5['Quantity_x']-df5['Quantity_y'])/np.where(df5.Quantity_x==0,df5.Quantity_y,df5.Quantity_x))*100
 #df5.to_excel(r'C:\Users\Admin\Downloads\work\rs3.xlsx')
+#df5.to_excel(r'C:\Users\6360isriniva\work\rs3.xlsx')
 print(df5['FundName'].unique())
 x=df5[df5['Asset']=='Equity']
 y=x['FundName'].unique().tolist()
 print(len(y))
 print(y)
-for i in y:
-   print('value is ',i)
-   df5[(df5['Asset']=='Equity') & (df5['FundName']== i)].groupby('Stockname').sum().nlargest(5,'% Quantity').plot(y=['Quantity_x','Quantity_y'],
-      title=i,kind='bar',figsize=(10,10))
-   df5[(df5['Asset']=='Equity') & (df5['FundName']== i)].groupby('Stockname').sum().nsmallest(5,'% Quantity').plot(y=['Quantity_x','Quantity_y'],
-      title=i,kind='bar',figsize=(10,10))
-   df5[(df5['Asset']=='Equity') & (df5['FundName']== i)].groupby('Stockname').sum().nsmallest(5,'% Quantity').plot (Table=True)
-      
+with PdfPages(r'C:\Users\6360isriniva\work\FMF_Analysis.pdf') as export_pdf:
+    for i in y:
+       print('value is ',i)
+       fig,(ax1,ax2)=plt.subplots(nrows=1,ncols=2)
+       df5[(df5['Asset']=='Equity') & (df5['FundName']== i) & (df5['% Quantity'] >= 0)].groupby('Stockname').sum().nlargest(5,'% Quantity').sort_values(by='% Quantity',ascending=False).plot(y=['Quantity_x','Quantity_y'],
+       title=i+'\n(% Qty Increased)',kind='bar',ax=ax1,figsize=(10,5),rot=80)
+       df5[(df5['Asset']=='Equity') & (df5['FundName']== i) & (df5['% Quantity'] <= 0)].groupby('Stockname').sum().nsmallest(5,'% Quantity').sort_values(by='% Quantity').plot(y=['Quantity_x','Quantity_y'],
+       title=i+'\n(%Qty Decreased)',kind='bar',ax=ax2,figsize=(10,5),rot=75)
+       plt.tight_layout()
+       export_pdf.savefig()
+       plt.close()    
+
+fig,(ax1,ax2)=plt.subplots(nrows=1,ncols=2,sharey='col')
+x=df5[(df5['Asset']=='Equity') & (df5['FundName']=='Franklin India Equity Fund ') ].groupby('Stockname').sum().nlargest(5,'% Quantity')
+x.plot(y= ['Quantity_x','Quantity_y'], title= 'Quantity',kind='bar',
+       table=x[['Quantity_x','Quantity_y','% Quantity']],ax=ax1,figsize=(20,5),layout=(10,15))
+data_list=x[['Quantity_x','Quantity_y','% Quantity']]
+#x.axis("off")
+z=df5[(df5['Asset']=='Equity') & (df5['FundName']=='Franklin India Equity Fund ') ].groupby('Stockname').sum().nsmallest(5,'% Quantity')
+z.plot( y= ['Quantity_x','Quantity_y'], title= 'Quantity',kind='bar',
+              table=z[['Quantity_x','Quantity_y','% Quantity']],fontsize=10,ax=ax2,figsize=(20,5))
+
+
+columns = ('Last', 'High', 'Low', 'Chg.', 'Chg. %', 'Time', 'T?')
+rows = ['Gold', 'Silver', 'Copper', 'Aluminum']
+
+data_list = np.random.randint(10,90, size=(len(rows), len(columns)))
+print(type(data_list))
+scatter_x = (1, 2, 3)
+scatter_y = (1224.53, 1231.76, 1228.70)
+
+fig = plt.figure(1)
+fig.subplots_adjust(left=0.2,top=0.8, wspace=1)
+
+#Table - Main table
+#ax = plt.subplot2grid((4,3), (0,0), colspan=2, rowspan=2)
+fig,(ax1,ax2)=plt.subplots(nrows=1,ncols=2)
+ax1.table(cellText=data_list,
+          rowLabels=rows,
+          colLabels=columns, loc="upper center")
+
+ax1.axis("off")
