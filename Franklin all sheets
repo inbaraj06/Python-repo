@@ -66,30 +66,45 @@ print(y)
 with PdfPages(r'C:\Users\6360isriniva\work\FMF_Analysis.pdf') as export_pdf:
     for i in y:
        print('value is ',i)
-       fig,(ax1,ax2)=plt.subplots(nrows=1,ncols=2,figsize=(20,10))
-       x=df5[(df5['Asset']=='Equity') & (df5['FundName']== i) & (df5['% Quantity'] >= 0)].groupby('Stockname').sum().nlargest(5,'% Quantity').sort_values(by='% Quantity',ascending=False)
-       data_list_x= x[['Quantity_x','Quantity_y','% Quantity']]
+       fig,((ax1,ax2),(ax3,ax4))=plt.subplots(2,2,figsize=(20,15))
+       x=df5[(df5['Asset']=='Equity') & (df5['FundName']== i) & (df5['% Quantity'] > 0)].groupby('Stockname').sum().nlargest(5,'% Quantity').sort_values(by='% Quantity',ascending=False)
        
-       x.plot(y=['Quantity_x','Quantity_y'],
-              title=i+'\n(% Qty Increased)',kind='bar',ax=ax1,rot=80)
+       if not x.empty:
+          data_list_x= x[['Quantity_x','Quantity_y','% Quantity']]
        
-       z=df5[(df5['Asset']=='Equity') & (df5['FundName']== i) & (df5['% Quantity'] <= 0)].groupby('Stockname').sum().nsmallest(5,'% Quantity').sort_values(by='% Quantity')
-       data_list_z=z[['Quantity_x','Quantity_y','% Quantity']]
+          x.plot(y=['Quantity_x','Quantity_y'],
+              title=i+'\n(% Qty Increased)',kind='bar',ax=ax1,rot=80,fontsize=15)
        
-       z.plot(y=['Quantity_x','Quantity_y'],
-               title=i+'\n(%Qty Decreased)',kind='bar',ax=ax2,rot=75)
-       export_pdf.savefig()
-       plt.close()      
+       z=df5[(df5['Asset']=='Equity') & (df5['FundName']== i) & (df5['% Quantity'] < 0)].groupby('Stockname').sum().nsmallest(5,'% Quantity').sort_values(by='% Quantity')
        
-       fig,(ax3,ax4)=plt.subplots(nrows=1,ncols=2)
-       ax3.table(cellText=data_list_x.values,
-           rowLabels=data_list_x.index.values,
-          colLabels=data_list_x.columns.values,loc="upper center")
-       ax4.table(cellText=data_list_z.values,
-           rowLabels=data_list_z.index.values,
-          colLabels=data_list_z.columns.values,loc="lower center")
+       if not z.empty:
+          data_list_z=z[['Quantity_x','Quantity_y','% Quantity']]
+       
+          z.plot(y=['Quantity_x','Quantity_y'],
+               title=i+'\n(%Qty Decreased)',kind='bar',ax=ax2,rot=75,fontsize=15)
+              #fig,(ax3,ax4)=plt.subplots(nrows=1,ncols=2,figsize=(20,10))
+       if not x.empty:
+           
+           ax3.table(cellText=data_list_x.values.tolist(),
+                rowLabels=x.index.values.tolist(),
+                colLabels=data_list_x.columns.values,fontsize=15,
+                 colWidths=[0.2]*3,rowLoc='left',
+                 loc='center right')
+       
+       if not z.empty:
+           ax4.table(cellText=data_list_z.values.tolist(),
+           rowLabels=z.index.values.tolist(),
+          colLabels=data_list_z.columns.values,fontsize=25,
+          colWidths=[0.25]*3,rowLoc='left',
+          loc='center right')
        ax3.axis("off")
        ax4.axis("off")
-       plt.tight_layout()
+       fig.suptitle(i,fontsize=40)
+       #plt.tight_layout()
        export_pdf.savefig()
        plt.close()      
+
+#x.plot(y= ['Quantity_x','Quantity_y'], title= 'Quantity',kind='bar',table=x[['Quantity_x','Quantity_y','%of Quanity']],figsize=(20,20))
+#print(x,y,sep='\n')
+#print(type(x),type(y),x.columns,y.columns,x.index,y.index,sep='\n')
+#print(x[['Quantity_x','Quantity_y','%of Quanity']])
