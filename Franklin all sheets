@@ -8,17 +8,25 @@ yl = pd.ExcelFile(input_path)
 res = len(yl.sheet_names)
 print(res)
 x=[]
-for i in range(0,res):
-  clm =pd.read_excel(input_path,sheet_name=i,
-                 skiprows=[2,3],
+for i in range(0,res): 
+    asset=pd.read_excel(input_path,sheet_name=i,
+                 nrows=0
+                 )
+    n=asset.columns.values[0]
+       
+    clm =pd.read_excel(input_path,sheet_name=i,
+                 skiprows=[1,2,3,4],
                  index_col=0,
                  usecols=5)
-  if len(clm.columns) ==5: 
+#  print(i)
+#  print(clm.columns)
+#  print(len(clm.columns))
+    if len(clm.columns) ==5: 
      df1=pd.read_excel(input_path,sheet_name=i,
-                 skiprows=[2,3],
+                 skiprows=[1,2,3,4],
                  index_col=0,names=['Instrument','Industry','Quantity','MarketValue','Percentage Assets'],
                  usecols=5)
-     df1['FundName'] =df1.index.name.split('As')[0]
+     df1['FundName'] =n.split('As')[0]
      df1=df1.dropna(subset=['Instrument'])
      df1=df1.dropna(subset=['Industry'])
      df1=df1.dropna(subset=['Quantity'])
@@ -27,13 +35,23 @@ for i in range(0,res):
      df1['MarketValue']=df1['MarketValue'].astype('float64')
      df1['Percentage Assets']=df1.loc[ :,'Percentage Assets'].replace(['*','0.00*'],0)
      df1['Percentage Assets']=df1['Percentage Assets'].astype('float64')
-     df1['Asset']=df1['Industry'].apply(lambda x:'Govse' if ('SOVEREIGN' in x )  else ('Debt' if ('CRISIL' in x or 'ICRA' in x or 'CARE' in x or 'BWR' in x or 'IND A' in x ) else 'Equity'))
+     df1['Asset']=df1['Industry'].apply(lambda x:'Govse' if ('SOVEREIGN' in x )  else ('Debt' if ('CRISIL' in x or 'ICRA' in x or 'CARE' in x 
+        or 'BWR' in x or 'IND A' in x or 'Privately Rated' in x ) else 'Equity'))
      x.append(df1)
 df2=pd.concat(x)
 df2.index.name='ISIN Number'
 print(df2.columns,df2.dtypes)
 #df2.to_excel(r'C:\Users\6360isriniva\work\rs5.xlsx')
-df2.to_excel(r'C:\Users\6360isriniva\work\rs6.xlsx')
+s=10
+#df2.to_excel(r'C:\Users\6360isriniva\work\rs{}.xlsx'.format(s))
+
+path =  r'C:\Users\6360isriniva\work\rs10.xlsx'
+book = load_workbook(path)
+writer = pd.ExcelWriter(path, engine = 'openpyxl')
+writer.book = book
+df2.to_excel(writer, sheet_name = 'x{}'.format(s))
+writer.save()
+writer.close()
 
 import pandas as pd 
 import numpy as np
