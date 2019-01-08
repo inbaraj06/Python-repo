@@ -1,46 +1,62 @@
 import pandas as pd 
-import numpy as np
-import matplotlib.pyplot as plt
-#import re as re 
-df=pd.read_excel(r'C:\Users\6360isriniva\work\FRMF.xlsx',sheet_name=10,
-                 skiprows=3,
-                 index_col=0,names=['Instrument','Industry','Quantity','MarketValue','Percentage Assets'])
-df_title=pd.read_excel(r'C:\Users\6360isriniva\work\FRMF.xlsx'
-                       ,sheet_name=10,nrows=0,parse_cols=0)
-x=df_title.columns
-y=x[0]
-y=y.split('As')
-print(type(df_title))
-print(df_title.columns,df_title.index)
-df=df.dropna(subset=['Instrument'])
-df['Quantity']=df['Quantity'].astype('int64')
-df['MarketValue']=df['MarketValue'].astype('float64')
-df['Percentage Assets']=df['Percentage Assets'].astype('float64')
+from openpyxl import load_workbook
+import glob
 
-print(df.dtypes,df.columns,sep='\n',) 
-#df'Asset Type']=np.where(if '%' in df['Instrument'],'Debt','Equity')
-print(df.loc[(df['Instrument']=='Voltas Ltd.') & (df['Industry']=='Construction Project')])
-print(df.loc[df['Industry']=='Banks'])
-print(df.iloc[:4,:2])
-print(df.iloc[6:14,:3])
-print(df.index,df.columns,sep='\n')
-print(df.iloc[:,0])
-print(df[df['Industry']=='Banks'])
-#df=df.assign(Asset=lambda x:( 'Equity' if x['Industry']== 'Banks'else 'Debt'))
-df['Asset']=df['Instrument'].apply(lambda x:'Govec' if ('%' in x and 'GOI' in x)  else ('Debt' if '%' in x else 'Equity'))
-df['FundName']=y[0]
-#print(df.iloc[:6,3])
-#print(df.iloc[:,2:])
-print(df)
-print(df.sum())
-#df.plot.bar(x='Industry',y=['Percentage Assets'])
-#df.groupby('Industry').sum().plot( y='Percentage Assets',title= '% Assets',kind='bar')
-df[df['Asset']=='Equity'].groupby('Industry').sum().plot(y='Quantity' ,title= '% Assets',kind='bar')
+# get data file names
+path =r'C:\Users\6360isriniva\work\Franklin'
+filenames = glob.glob(path + "/frmf*.xlsx")
 
-ax=df[df['Asset']=='Equity'].groupby(['Industry','Instrument']).sum().unstack().plot(y='Percentage Assets' ,title= '% Assets',kind='bar',figsize=(15,15),stacked=True)
-# set individual bar lables using above list
-for i in ax.patches:
-    # get_x pulls left or right; get_height pushes up or down
-   ax.text(i.get_x()+.04, i.get_height()+2, \
-          str(round((i.get_height()), 2)), fontsize=11, color='dimgrey',
-             rotation=45)
+#Output Path
+o_path =  r'C:\Users\6360isriniva\work\Franklin\df_franklin.xlsx'
+
+#Start interation for each files 
+sheet_no=1
+for input_path in filenames :
+  print(input_path)
+    
+# get nubmer of sheets in each files 
+  yl = pd.ExcelFile(input_path)
+  res = len(yl.sheet_names)
+  print(res)
+  x=[]  #Initiate default list 
+  for i in range(0,res): 
+    asset=pd.read_excel(input_path,sheet_name=i,
+                 nrows=0
+                 )
+    n=asset.columns.values[0]
+       
+    clm =pd.read_excel(input_path,sheet_name=i,
+                 skiprows=[1,2,3,4],
+                 index_col=0,
+                 usecols=5
+                 )
+    if len(clm.columns) ==5: 
+     print(i)   
+     df1=pd.read_excel(input_path,sheet_name=i,
+                 skiprows=[1,2,3,4],
+                 index_col=0,names=['Instrument','Industry','Quantity','MarketValue','Percentage Assets'],
+                 usecols=5)
+     df1['FundName'] =n.split('As')[0]
+     df1=df1.dropna(subset=['Instrument'])
+     df1=df1.dropna(subset=['Industry'])
+     df1=df1.dropna(subset=['Quantity'])
+     df1=df1.dropna(subset=['MarketValue'])
+     df1['Quantity']=df1['Quantity'].astype('int64')
+     df1['MarketValue']=df1['MarketValue'].astype('float64')
+     df1['Percentage Assets']=df1.loc[ :,'Percentage Assets'].replace(['$0.00%','*','0.00*'],0)
+     df1['Percentage Assets']=df1['Percentage Assets'].astype('float64')
+     df1['Asset']=df1['Industry'].apply(lambda x:'Govse' if ('SOVEREIGN' in x.upper() )  else ('Debt' if ('CRISIL' in x or 'ICRA' in x or 'CARE' in x 
+        or 'BWR' in x or 'IND A' in x or 'Privately Rated' in x ) else 'Equity'))
+     x.append(df1)
+
+  df2=pd.concat(x)
+  df2.index.name='ISIN Number'
+  print(df2.columns,df2.dtypes)
+  #df2.to_excel(r'C:\Users\6360isriniva\work\AXISMF.xlsx')
+  book = load_workbook(o_path)
+  writer = pd.ExcelWriter(o_path, engine = 'openpyxl')
+  writer.book = book
+  df2.to_excel(writer, sheet_name = 'axmf{}'.format(sheet_no))
+  writer.save()
+  writer.close()
+  sheet_no=sheet_no+1
