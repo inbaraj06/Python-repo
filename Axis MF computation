@@ -1,0 +1,71 @@
+import pandas as pd 
+from openpyxl import load_workbook
+import glob
+
+# get data file names
+path =r'C:\Users\6360isriniva\work\axis'
+filenames = glob.glob(path + "/axmf*.xlsx")
+
+#Output Path
+o_path =  r'C:\Users\6360isriniva\work\axis\df_axis.xlsx'
+
+#Start interation for each files 
+sheet_no=1
+for input_path in filenames :
+  print(input_path)
+    
+# get nubmer of sheets in each files 
+  yl = pd.ExcelFile(input_path)
+  res = len(yl.sheet_names)
+  print(res)
+  x=[]  #Initiate default list 
+  for i in range(0,res): 
+    asset=pd.read_excel(input_path,sheet_name=i,
+                 nrows=0
+                 )
+    n=asset.columns.values[0]
+       
+    clm =pd.read_excel(input_path,sheet_name=i,
+                 skiprows=[1,2,3,4],
+                 index_col=1,
+                 usecols=[1,2,3,4,5,6]
+                 )  
+    if len(clm.columns) ==5: 
+     print(i)   
+     df1=pd.read_excel(input_path,sheet_name=i,
+                 skiprows=[1,2,3,4],
+                 index_col=1,
+                 usecols=[1,2,3,4,5,6],
+                 names=['Instrument','Industry','Quantity','MarketValue','Percentage Assets'],
+                 )
+     df1['FundName'] =n.split('As')[0]
+     df1=df1.dropna(subset=['Instrument'])
+     df1=df1.dropna(subset=['Industry'])
+     df1=df1.dropna(subset=['Quantity'])
+     df1=df1.dropna(subset=['MarketValue'])
+     df1['Quantity']=df1['Quantity'].astype('int64')
+     df1['MarketValue']=df1['MarketValue'].astype('float64')
+     df1['Percentage Assets']=df1.loc[ :,'Percentage Assets'].replace(['$0.00%','*','0.00*'],0)
+     df1['Percentage Assets']=df1['Percentage Assets'].astype('float64')
+     df1['Asset']=df1['Industry'].apply(lambda x:'Govse' if ('SOVEREIGN' in x.upper() )  else ('Debt' if ('CRISIL' in x or 'ICRA' in x or 'CARE' in x 
+        or 'BWR' in x or 'IND A' in x or 'Privately Rated' in x ) else 'Equity'))
+     x.append(df1)
+
+  df2=pd.concat(x)
+  df2.index.name='ISIN Number'
+  print(df2.columns,df2.dtypes)
+  #df2.to_excel(r'C:\Users\6360isriniva\work\AXISMF.xlsx')
+  book = load_workbook(o_path)
+  writer = pd.ExcelWriter(o_path, engine = 'openpyxl')
+  writer.book = book
+  df2.to_excel(writer, sheet_name = 'axmf{}'.format(sheet_no))
+  writer.save()
+  writer.close()
+  sheet_no=sheet_no+1
+
+
+
+
+
+
+
